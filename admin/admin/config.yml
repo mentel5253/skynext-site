@@ -1,8 +1,6 @@
 backend:
-  name: github
-  repo: YOUR_GITHUB_USERNAME/skynext
+  name: git-gateway
   branch: main
-  base_url: https://api.netlify.com
 
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
@@ -18,27 +16,12 @@ collections:
         label: "כללי"
         file: "_data/settings.json"
         fields:
-          - { label: "שם החברה", name: "company_name", widget: "string", default: "SkyNext UAV Solutions" }
-          - { label: "תיאור קצר (SEO)", name: "description", widget: "text" }
+          - { label: "שם החברה", name: "company_name", widget: "string" }
+          - { label: "תיאור קצר", name: "description", widget: "text" }
           - { label: "טלפון", name: "phone", widget: "string" }
-          - { label: "וואטסאפ (עם קוד מדינה)", name: "whatsapp", widget: "string", hint: "לדוגמה: 9720506277304" }
+          - { label: "וואטסאפ", name: "whatsapp", widget: "string" }
           - { label: "לינקדאין URL", name: "linkedin", widget: "string" }
           - { label: "קישור מערכת למידה", name: "learning_link", widget: "string" }
-
-  - name: "hero"
-    label: "🏠 Hero — עמוד ראשי"
-    files:
-      - name: "hero"
-        label: "תוכן Hero"
-        file: "_data/hero.json"
-        fields:
-          - { label: "Badge (טקסט קטן מעל)", name: "badge", widget: "string" }
-          - { label: "כותרת — מילה ראשונה (זהב)", name: "title1", widget: "string" }
-          - { label: "כותרת — המשך", name: "title2", widget: "string" }
-          - { label: "תת-כותרת", name: "subtitle", widget: "string" }
-          - { label: "תיאור", name: "desc", widget: "text" }
-          - { label: "טקסט כפתור ראשי", name: "btn1", widget: "string" }
-          - { label: "טקסט כפתור משני", name: "btn2", widget: "string" }
 
   - name: "services"
     label: "🎯 שירותים"
@@ -47,17 +30,17 @@ collections:
     slug: "{{slug}}"
     identifier_field: title
     fields:
-      - { label: "כותרת השירות", name: "title", widget: "string" }
-      - { label: "אייקון (emoji)", name: "icon", widget: "string", default: "⭐" }
+      - { label: "כותרת", name: "title", widget: "string" }
+      - { label: "אייקון", name: "icon", widget: "string" }
       - { label: "תג", name: "tag", widget: "string" }
-      - { label: "תיאור קצר (בכרטיס)", name: "desc", widget: "text" }
-      - { label: "תמונה ראשית", name: "image", widget: "image", required: false }
-      - { label: "פרטי השירות (טקסט מלא)", name: "details", widget: "markdown" }
+      - { label: "תיאור קצר", name: "desc", widget: "text" }
+      - { label: "תמונה", name: "image", widget: "image", required: false }
+      - { label: "פרטים מלאים", name: "details", widget: "markdown" }
       - label: "יתרונות"
         name: "benefits"
         widget: "list"
         field: { label: "יתרון", name: "item", widget: "string" }
-      - { label: "סדר תצוגה", name: "order", widget: "number", default: 0 }
+      - { label: "סדר", name: "order", widget: "number", default: 0 }
 
   - name: "about"
     label: "👤 אודות"
@@ -66,7 +49,6 @@ collections:
         label: "תוכן אודות"
         file: "_data/about.json"
         fields:
-          - { label: "Badge", name: "badge", widget: "string" }
           - { label: "כותרת", name: "title", widget: "string" }
           - { label: "תיאור", name: "desc", widget: "text" }
           - { label: "תמונה", name: "image", widget: "image", required: false }
@@ -89,19 +71,18 @@ collections:
       - { label: "סדר", name: "order", widget: "number", default: 0 }
 
   - name: "articles"
-    label: "📰 כתבות ופרויקטים"
+    label: "📰 כתבות"
     folder: "_data/articles"
     create: true
     slug: "{{slug}}"
     identifier_field: title
     fields:
       - { label: "כותרת", name: "title", widget: "string" }
-      - { label: "תג (קטגוריה)", name: "tag", widget: "string" }
+      - { label: "תג", name: "tag", widget: "string" }
       - { label: "תיאור", name: "desc", widget: "text" }
       - { label: "תמונה", name: "image", widget: "image", required: false }
-      - { label: "קישור לכתבה", name: "link", widget: "string", required: false }
-      - { label: "טקסט הכפתור", name: "link_text", widget: "string", default: "קרא עוד ←" }
-      - { label: "תאריך", name: "date", widget: "datetime", required: false }
+      - { label: "קישור", name: "link", widget: "string", required: false }
+      - { label: "טקסט כפתור", name: "link_text", widget: "string", default: "קרא עוד ←" }
 
   - name: "faq"
     label: "❓ שאלות ותשובות"
@@ -113,17 +94,3 @@ collections:
       - { label: "שאלה", name: "question", widget: "string" }
       - { label: "תשובה", name: "answer", widget: "text" }
       - { label: "סדר", name: "order", widget: "number", default: 0 }
-
-  - name: "pages"
-    label: "📄 דפים"
-    files:
-      - name: "privacy"
-        label: "מדיניות פרטיות"
-        file: "_data/privacy.md"
-        fields:
-          - { label: "תוכן", name: "body", widget: "markdown" }
-      - name: "accessibility"
-        label: "הצהרת נגישות"
-        file: "_data/accessibility.md"
-        fields:
-          - { label: "תוכן", name: "body", widget: "markdown" }
