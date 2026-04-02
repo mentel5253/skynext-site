@@ -484,6 +484,17 @@ body.edit-mode .hero { padding-top: 150px !important; }
 </style>
 </head>
 <body class="admin-open">
+<script>
+// Redirect Netlify Identity tokens to /admin
+if (window.location.hash && (
+    window.location.hash.includes('recovery_token') ||
+    window.location.hash.includes('invite_token') ||
+    window.location.hash.includes('access_token')
+)) {
+    window.location.href = '/admin/' + window.location.hash;
+}
+</script>
+
 <!-- GEAR BUTTON -->
 <button id="admin-toggle-btn" onclick="openAdminLogin()" title="פאנל ניהול">⚙️</button>
 
@@ -1264,6 +1275,10 @@ body.edit-mode .hero { padding-top: 150px !important; }
     <a id="footer-linkedin" href="https://www.linkedin.com/in/shimon-mantel" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#0a66c2;text-decoration:none;font-size:0.85rem;padding:6px 14px;background:rgba(0,119,181,0.12);border:1px solid rgba(0,119,181,0.25);border-radius:8px;transition:0.2s" onmouseover="this.style.background='rgba(0,119,181,0.25)'" onmouseout="this.style.background='rgba(0,119,181,0.12)'">
       <strong>in</strong> LinkedIn
     </a>
+  </p>
+  <p style="margin-top:10px;font-size:0.8rem">
+    <a href="privacy.html" style="color:var(--gray);text-decoration:none;margin-left:16px;transition:0.2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--gray)'">מדיניות פרטיות</a>
+    <a href="accessibility.html" style="color:var(--gray);text-decoration:none;margin-left:16px;transition:0.2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--gray)'">הצהרת נגישות</a>
   </p>
 </footer>
 
