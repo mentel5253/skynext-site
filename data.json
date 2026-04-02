@@ -173,9 +173,30 @@
   "linkedin": "",
   "servicePages": {
     "0": {
-      "details": "",
+      "details": "ייעוץ מקצועי מעמיק לארגונים, קיבוצים, ישובים וגופים ביטחוניים בנושא אסטרטגיית כטב\"מ, רכש, התאמה, ליווי רגולטורי צמוד לכטב\"מים חדשים / מיוחדים  ופריסה מבצעית.",
       "benefitsTitle": "יתרונות",
       "benefits": "יתרון ראשון\nיתרון שני\nיתרון שלישי",
+      "img": "",
+      "gallery": []
+    },
+    "1": {
+      "details": "",
+      "benefitsTitle": "יתרונות",
+      "benefits": "",
+      "img": "",
+      "gallery": []
+    },
+    "2": {
+      "details": "",
+      "benefitsTitle": "יתרונות",
+      "benefits": "",
+      "img": "",
+      "gallery": []
+    },
+    "3": {
+      "details": "",
+      "benefitsTitle": "יתרונות",
+      "benefits": "",
       "img": "",
       "gallery": []
     },
@@ -183,6 +204,13 @@
       "details": "",
       "benefitsTitle": "יתרונות",
       "benefits": "ידע רב בתחום המבצעי וההדרכתי\nקורס קצר בבית הלקוח עד קבלת רישיון\nתמיכה וסיוע גם לאחר סיום הקורס",
+      "img": "",
+      "gallery": []
+    },
+    "5": {
+      "details": "",
+      "benefitsTitle": "יתרונות",
+      "benefits": "",
       "img": "",
       "gallery": []
     }
