@@ -572,6 +572,7 @@ async function doPublish(){
     if(!upRes.ok){ var e=await upRes.json(); throw new Error(e.message||'שגיאת העלאה'); }
 
     status.innerHTML='<span style="color:#16a34a;font-weight:700">✅ פורסם! יתעדכן תוך ~2 דקות</span>';
+    localStorage.removeItem('sn_data');
     setTimeout(closePub,3000);
 
   }catch(e){
