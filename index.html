@@ -2374,7 +2374,7 @@ function closeEditMode() {
 
 // ===== INIT =====
 // Load data from data.json (updated by editor)
-fetch('data.json?v=' + Date.now())
+fetch('data.json?v=' + Date.now(), {cache: 'no-store'})
   .then(function(r){ return r.json(); })
   .then(function(d){
     // Merge with localStorage overrides
