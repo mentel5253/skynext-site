@@ -558,12 +558,25 @@ async function doPublish(){
     if(!found){ status.innerHTML='<span style="color:red">❌ לא נמצאה שורת DEFAULTS</span>'; return; }
     var newText=lines.join('\n');
 
-    // Upload
+    // Upload - use chunk-based btoa for large files
     status.innerHTML='⏳ מעלה...';
     var uploadBytes=new TextEncoder().encode(newText);
-    var uploadBin='';
-    uploadBytes.forEach(function(b){uploadBin+=String.fromCharCode(b);});
-    var uploadB64=btoa(uploadBin);
+    // Convert to base64 in chunks to avoid btoa size limit
+    var chunkSize=8192;
+    var uploadB64='';
+    for(var ci=0;ci<uploadBytes.length;ci+=chunkSize){
+      var chunk=uploadBytes.subarray(ci,ci+chunkSize);
+      var binChunk='';
+      chunk.forEach(function(b){binChunk+=String.fromCharCode(b);});
+      uploadB64+=btoa(binChunk);
+    }
+    // Note: chunked btoa doesn't work directly - use Blob approach instead
+    uploadB64 = await new Promise(function(resolve){
+      var blob = new Blob([uploadBytes]);
+      var reader = new FileReader();
+      reader.onload = function(){ resolve(reader.result.split(',')[1]); };
+      reader.readAsDataURL(blob);
+    });
 
     var upRes=await fetch(api+'/contents/index.html',{
       method:'PUT',headers:hdrs,
