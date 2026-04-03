@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyNext — עורך</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#1a1a2e}
+#login{position:fixed;inset:0;background:#1a1a2e;display:flex;align-items:center;justify-content:center;z-index:9999}
+.lbox{background:#1e2845;border:1px solid rgba(200,168,75,0.3);border-radius:16px;padding:40px;width:320px;text-align:center}
+.lbox h1{color:#c8a84b;font-size:1.4rem;margin-bottom:20px}
+.lbox input{width:100%;padding:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(200,168,75,0.2);border-radius:8px;color:white;font-size:1rem;outline:none;margin-bottom:12px;direction:ltr;text-align:center}
+.lbox button{width:100%;padding:12px;background:#c8a84b;color:#1a1a2e;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer}
+.lerr{color:#f87171;font-size:0.82rem;margin-top:8px;display:none}
+#app{display:none}
+.header{background:#1a1a2e;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{color:#c8a84b;font-size:1rem}
+.hbtns{display:flex;gap:8px;align-items:center}
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:0.85rem;font-weight:600}
+.btn-green{background:#16a34a;color:white}
+.btn-gray{background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2)}
+.btn-red{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.status{font-size:0.8rem;color:#94a3b8}
+.layout{display:flex;min-height:calc(100vh - 52px)}
+.sidebar{width:180px;background:white;border-left:1px solid #e2e8f0;padding:12px 0;flex-shrink:0}
+.nav{display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;font-size:0.85rem;color:#64748b;border-right:3px solid transparent;transition:0.15s}
+.nav:hover{background:#f8fafc;color:#1a1a2e}
+.nav.active{background:#fef9ee;color:#c8a84b;border-right-color:#c8a84b;font-weight:600}
+.main{flex:1;padding:20px;max-width:780px}
+.sec{display:none}
+.sec.active{display:block}
+.card{background:white;border-radius:12px;padding:20px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.card-title{font-size:0.78rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:14px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:0.8rem;font-weight:600;color:#374151;margin-bottom:4px}
+.field input,.field textarea,.field select{width:100%;padding:9px 11px;border:1px solid #d1d5db;border-radius:8px;font-size:0.9rem;font-family:inherit;outline:none;transition:0.15s;color:#1a1a2e}
+.field input:focus,.field textarea:focus{border-color:#c8a84b;box-shadow:0 0 0 3px rgba(200,168,75,0.1)}
+.field textarea{resize:vertical;min-height:70px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:10px}
+.item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.item-title{font-weight:600;font-size:0.88rem;color:#374151}
+.btn-del{background:rgba(239,68,68,0.1);color:#dc2626;border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:0.75rem}
+.btn-add{width:100%;padding:10px;background:#f0f9ff;color:#0369a1;border:1px dashed #7dd3fc;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;margin-top:4px}
+.sp-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-top:10px}
+.sp-label{font-size:0.75rem;font-weight:700;color:#1d4ed8;margin-bottom:8px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#1a1a2e;color:#86efac;padding:9px 22px;border-radius:50px;font-size:0.85rem;font-weight:600;transition:0.3s;z-index:9999;pointer-events:none;border:1px solid rgba(34,197,94,0.3)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#pub-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center}
+#pub-modal.show{display:flex}
+.pub-box{background:white;border-radius:16px;padding:28px;width:360px;text-align:center}
+.pub-box h2{font-size:1.1rem;margin-bottom:8px}
+.pub-box p{color:#64748b;font-size:0.85rem;margin-bottom:20px}
+.pub-btns{display:flex;gap:10px;justify-content:center}
+#pub-status{margin-top:14px;font-size:0.85rem}
+#gh-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9998;align-items:center;justify-content:center}
+#gh-modal.show{display:flex}
+.gh-box{background:white;border-radius:16px;padding:28px;width:400px}
+.gh-box h2{font-size:1.1rem;margin-bottom:16px;color:#1a1a2e}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lbox">
+    <h1>✈ SkyNext עורך</h1>
+    <input type="password" id="pwd" placeholder="סיסמה" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="lerr" id="lerr">❌ סיסמה שגויה</div>
+    <button onclick="doLogin()">כניסה</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="header">
+    <h1>✈ SkyNext — עורך תוכן</h1>
+    <div class="hbtns">
+      <span class="status" id="status-txt"></span>
+      <button class="btn btn-gray" onclick="openGH()">⚙️ GitHub</button>
+      <button class="btn btn-gray" onclick="reloadData()">🔄 טען</button>
+      <button class="btn btn-green" onclick="openPub()">🚀 פרסם</button>
+      <button class="btn btn-red" onclick="doLogout()">יציאה</button>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="nav active" onclick="showSec('general',this)">🏠 כללי</div>
+      <div class="nav" onclick="showSec('hero',this)">📝 Hero</div>
+      <div class="nav" onclick="showSec('services',this)">🎯 שירותים</div>
+      <div class="nav" onclick="showSec('about',this)">👤 אודות</div>
+      <div class="nav" onclick="showSec('articles',this)">📰 כתבות</div>
+      <div class="nav" onclick="showSec('faq',this)">❓ FAQ</div>
+      <div class="nav" onclick="showSec('contact',this)">📞 קשר</div>
+    </div>
+    <div class="main">
+
+      <!-- GENERAL -->
+      <div class="sec active" id="sec-general">
+        <div class="card">
+          <div class="card-title">פרטי חברה</div>
+          <div class="field"><label>שם החברה</label><input id="f-company"></div>
+          <div class="row">
+            <div class="field"><label>טלפון</label><input id="f-phone" dir="ltr"></div>
+            <div class="field"><label>וואטסאפ (972...)</label><input id="f-wa" dir="ltr"></div>
+          </div>
+          <div class="field"><label>קישור מערכת למידה</label><input id="f-learning" dir="ltr"></div>
+          <div class="field"><label>LinkedIn</label><input id="f-linkedin" dir="ltr"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">כותרת סקציית שירותים</div>
+          <div class="row">
+            <div class="field"><label>כותרת לבן</label><input id="f-svc-title"></div>
+            <div class="field"><label>כותרת זהב</label><input id="f-svc-gold"></div>
+          </div>
+          <div class="field"><label>תיאור</label><input id="f-svc-desc"></div>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div class="sec" id="sec-hero">
+        <div class="card">
+          <div class="field"><label>Badge</label><input id="f-badge"></div>
+          <div class="row">
+            <div class="field"><label>כותרת — מילה זהב</label><input id="f-title1"></div>
+            <div class="field"><label>כותרת — המשך</label><input id="f-title2"></div>
+          </div>
+          <div class="field"><label>תת-כותרת</label><input id="f-subtitle"></div>
+          <div class="field"><label>תיאור</label><textarea id="f-desc"></textarea></div>
+          <div class="row">
+            <div class="field"><label>כפתור ראשי</label><input id="f-btn1"></div>
+            <div class="field"><label>כפתור משני</label><input id="f-btn2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="sec" id="sec-services">
+        <div id="svc-list"></div>
+        <button class="btn-add" onclick="addSvc()">+ הוסף שירות</button>
+      </div>
+
+      <!-- ABOUT -->
+      <div class="sec" id="sec-about">
+        <div class="card">
+          <div class="field"><label>כותרת</label><input id="f-about-title"></div>
+          <div class="field"><label>תיאור</label><textarea id="f-about-desc"></textarea></div>
+          <div class="row">
+            <div class="field"><label>תווית זהב שורה 1</label><input id="f-acc-top"></div>
+            <div class="field"><label>תווית זהב שורה 2</label><input id="f-acc-bot"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">רשימת הישגים</div>
+          <div id="about-list"></div>
+          <button class="btn-add" onclick="addAbout()">+ הוסף</button>
+        </div>
+      </div>
+
+      <!-- ARTICLES -->
+      <div class="sec" id="sec-articles">
+        <div id="art-list"></div>
+        <button class="btn-add" onclick="addArt()">+ הוסף כתבה</button>
+      </div>
+
+      <!-- FAQ -->
+      <div class="sec" id="sec-faq">
+        <div id="faq-list"></div>
+        <button class="btn-add" onclick="addFaq()">+ הוסף שאלה</button>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="sec" id="sec-contact">
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>Badge</label><input id="f-con-badge"></div>
+            <div class="field"><label>כותרת זהב</label><input id="f-con-title"></div>
+          </div>
+          <div class="field"><label>תיאור</label><textarea id="f-con-desc" style="min-height:55px"></textarea></div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="field"><label>שם פוטר</label><input id="f-foot-name"></div>
+            <div class="field"><label>טקסט פוטר</label><input id="f-foot-sub"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISH MODAL -->
+<div id="pub-modal">
+  <div class="pub-box">
+    <div style="font-size:2rem;margin-bottom:10px">🚀</div>
+    <h2>פרסם לאתר</h2>
+    <p>השינויים יופיעו ב-<strong>mentel5253.github.io/skynext-site</strong></p>
+    <div class="pub-btns">
+      <button class="btn btn-green" onclick="doPublish()">פרסם עכשיו ✓</button>
+      <button class="btn btn-gray" onclick="closePub()">ביטול</button>
+    </div>
+    <div id="pub-status"></div>
+  </div>
+</div>
+
+<!-- GITHUB SETTINGS MODAL -->
+<div id="gh-modal">
+  <div class="gh-box">
+    <h2>⚙️ הגדרות GitHub</h2>
+    <div class="field"><label>Token</label><input id="gh-token" type="password" dir="ltr" placeholder="ghp_..."></div>
+    <div class="row">
+      <div class="field"><label>משתמש</label><input id="gh-user" dir="ltr" placeholder="mentel5253"></div>
+      <div class="field"><label>Repository</label><input id="gh-repo" dir="ltr" placeholder="skynext-site"></div>
+    </div>
+    <div class="pub-btns" style="margin-top:16px">
+      <button class="btn btn-green" onclick="saveGH()">שמור</button>
+      <button class="btn btn-gray" onclick="closeGH()">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var D = {};
+var PWD = 'pilot';
+
+// ===== AUTH =====
+function doLogin(){
+  if(document.getElementById('pwd').value===PWD){
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadGHSettings();
+    loadData();
+  } else {
+    document.getElementById('lerr').style.display='block';
+  }
+}
+function doLogout(){
+  document.getElementById('login').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+// ===== TOAST =====
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+// ===== NAV =====
+function showSec(name,el){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nav').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('sec-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ===== GITHUB =====
+function loadGHSettings(){
+  var t=localStorage.getItem('gh_token');
+  var u=localStorage.getItem('gh_user');
+  var r=localStorage.getItem('gh_repo');
+  if(t) document.getElementById('gh-token').value=t;
+  if(u) document.getElementById('gh-user').value=u;
+  if(r) document.getElementById('gh-repo').value=r;
+  if(t&&u&&r) document.getElementById('status-txt').textContent='✓ מחובר ל-'+u+'/'+r;
+}
+function openGH(){ document.getElementById('gh-modal').classList.add('show'); }
+function closeGH(){ document.getElementById('gh-modal').classList.remove('show'); }
+function saveGH(){
+  var t=document.getElementById('gh-token').value.trim();
+  var u=document.getElementById('gh-user').value.trim();
+  var r=document.getElementById('gh-repo').value.trim();
+  if(!t||!u||!r){ toast('❌ מלא הכל'); return; }
+  localStorage.setItem('gh_token',t);
+  localStorage.setItem('gh_user',u);
+  localStorage.setItem('gh_repo',r);
+  document.getElementById('status-txt').textContent='✓ מחובר ל-'+u+'/'+r;
+  closeGH(); toast('✅ נשמר');
+}
+
+// ===== LOAD DATA =====
+function reloadData(){
+  localStorage.removeItem('sn_data');
+  loadData();
+}
+
+function loadData(){
+  var token=localStorage.getItem('gh_token');
+  var user=localStorage.getItem('gh_user');
+  var repo=localStorage.getItem('gh_repo');
+  
+  // Try localStorage first
+  var saved=localStorage.getItem('sn_data');
+  if(saved){
+    try{ D=JSON.parse(saved); renderAll(); toast('✅ נטען'); return; }catch(e){}
+  }
+  
+  // Fetch from GitHub
+  if(!token||!user||!repo){ toast('⚙️ הגדר GitHub'); D={}; renderAll(); return; }
+  
+  toast('⏳ טוען מ-GitHub...');
+  fetch('https://api.github.com/repos/'+user+'/'+repo+'/contents/index.html',{
+    headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(fd){
+    // Decode base64 content
+    var b64=fd.content.split('\n').join('');
+    var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});
+    var text=new TextDecoder('utf-8').decode(bytes);
+    // Extract DEFAULTS
+    var m=text.match(/atob\('([A-Za-z0-9+/=]+)'\)/);
+    if(m){
+      D=JSON.parse(new TextDecoder('utf-8').decode(Uint8Array.from(atob(m[1]),function(c){return c.charCodeAt(0);})));
+      localStorage.setItem('sn_data',JSON.stringify(D));
+      renderAll();
+      toast('✅ נטען מ-GitHub!');
+    } else {
+      toast('❌ לא נמצאו נתונים');
+    }
+  })
+  .catch(function(e){ toast('❌ '+e.message); });
+}
+
+// ===== RENDER =====
+function v(id){ var e=document.getElementById(id); return e?e.value:''; }
+function sv(id,val){ var e=document.getElementById(id); if(e) e.value=val||''; }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function renderAll(){
+  sv('f-company',D.footerText);
+  sv('f-phone',D.phone);
+  sv('f-wa',D.whatsapp);
+  sv('f-learning',D.learningLink);
+  sv('f-linkedin',D.linkedin);
+  sv('f-svc-title',D.svcTitle);
+  sv('f-svc-gold',D.svcTitleGold);
+  sv('f-svc-desc',D.svcDesc);
+  sv('f-badge',D.badge);
+  sv('f-title1',D.title1);
+  sv('f-title2',D.title2);
+  sv('f-subtitle',D.subtitle);
+  sv('f-desc',D.desc);
+  sv('f-btn1',D.heroBtn1);
+  sv('f-btn2',D.heroBtn2);
+  sv('f-about-title',D.aboutTitle?D.aboutTitle.replace(/<[^>]+>/g,''):'');
+  sv('f-about-desc',D.aboutDesc);
+  sv('f-acc-top',D.aboutAccentTop);
+  sv('f-acc-bot',D.aboutAccentBottom);
+  sv('f-con-badge',D.contactBadge);
+  sv('f-con-title',D.contactTitle);
+  sv('f-con-desc',D.contactDesc);
+  sv('f-foot-name',D.footerText);
+  sv('f-foot-sub',D.footerSub);
+  renderSvcs(); renderAbout(); renderArts(); renderFaq();
+}
+
+function collectAll(){
+  D.footerText=v('f-company');
+  D.phone=v('f-phone');
+  D.whatsapp=v('f-wa');
+  D.learningLink=v('f-learning');
+  D.linkedin=v('f-linkedin');
+  D.svcTitle=v('f-svc-title');
+  D.svcTitleGold=v('f-svc-gold');
+  D.svcDesc=v('f-svc-desc');
+  D.badge=v('f-badge');
+  D.title1=v('f-title1');
+  D.title2=v('f-title2');
+  D.subtitle=v('f-subtitle');
+  D.desc=v('f-desc');
+  D.heroBtn1=v('f-btn1');
+  D.heroBtn2=v('f-btn2');
+  D.aboutDesc=v('f-about-desc');
+  D.aboutAccentTop=v('f-acc-top');
+  D.aboutAccentBottom=v('f-acc-bot');
+  D.contactBadge=v('f-con-badge');
+  D.contactTitle=v('f-con-title');
+  D.contactDesc=v('f-con-desc');
+  D.footerSub=v('f-foot-sub');
+  // About list
+  D.aboutList=Array.from(document.querySelectorAll('.ab-inp')).map(function(i){return i.value;});
+  // Services
+  D.services=Array.from(document.querySelectorAll('.svc-item')).map(function(item,i){
+    if(!D.servicePages) D.servicePages={};
+    D.servicePages[i]={
+      details:item.querySelector('[data-sp=details]').value,
+      benefitsTitle:item.querySelector('[data-sp=bt]').value||'יתרונות',
+      benefits:item.querySelector('[data-sp=ben]').value,
+      img:(D.servicePages[i]&&D.servicePages[i].img)||'',
+      gallery:(D.servicePages[i]&&D.servicePages[i].gallery)||[]
+    };
+    return{
+      icon:item.querySelector('[data-f=icon]').value,
+      title:item.querySelector('[data-f=title]').value,
+      tag:item.querySelector('[data-f=tag]').value,
+      desc:item.querySelector('[data-f=desc]').value
+    };
+  });
+  // Articles
+  D.articlesItems=Array.from(document.querySelectorAll('.art-item')).map(function(item){
+    return{
+      tag:item.querySelector('[data-f=tag]').value,
+      title:item.querySelector('[data-f=title]').value,
+      desc:item.querySelector('[data-f=desc]').value,
+      link:item.querySelector('[data-f=link]').value,
+      linkText:item.querySelector('[data-f=lt]').value
+    };
+  });
+  // FAQ
+  D.faq=Array.from(document.querySelectorAll('.faq-item')).map(function(item){
+    return{q:item.querySelector('[data-f=q]').value,a:item.querySelector('[data-f=a]').value};
+  });
+  localStorage.setItem('sn_data',JSON.stringify(D));
+}
+
+// ===== SERVICES =====
+function renderSvcs(){
+  var el=document.getElementById('svc-list');
+  el.innerHTML=(D.services||[]).map(function(s,i){
+    var sp=(D.servicePages&&D.servicePages[i])?D.servicePages[i]:{};
+    return '<div class="item svc-item">'
+      +'<div class="item-head"><span class="item-title">'+esc(s.icon)+' '+esc(s.title)+'</span>'
+      +'<button class="btn-del" onclick="this.closest(\'.svc-item\').remove()">🗑</button></div>'
+      +'<div class="row"><div class="field"><label>אייקון</label><input data-f="icon" value="'+esc(s.icon)+'"></div>'
+      +'<div class="field"><label>תג</label><input data-f="tag" value="'+esc(s.tag)+'"></div></div>'
+      +'<div class="field"><label>כותרת</label><input data-f="title" value="'+esc(s.title)+'"></div>'
+      +'<div class="field"><label>תיאור קצר</label><textarea data-f="desc">'+esc(s.desc)+'</textarea></div>'
+      +'<div class="sp-box"><div class="sp-label">📄 דף פנימי</div>'
+      +'<div class="field"><label>פרטים</label><textarea data-sp="details">'+esc(sp.details||'')+'</textarea></div>'
+      +'<div class="field"><label>כותרת יתרונות</label><input data-sp="bt" value="'+esc(sp.benefitsTitle||'יתרונות')+'"></div>'
+      +'<div class="field"><label>יתרונות (שורה=יתרון)</label><textarea data-sp="ben">'+esc(sp.benefits||'')+'</textarea></div>'
+      +'</div></div>';
+  }).join('');
+}
+function addSvc(){
+  collectAll();
+  D.services=D.services||[];
+  D.services.push({icon:'⭐',title:'שירות חדש',tag:'תג',desc:'תיאור'});
+  renderSvcs();
+}
+
+// ===== ABOUT =====
+function renderAbout(){
+  var el=document.getElementById('about-list');
+  el.innerHTML=(D.aboutList||[]).map(function(item){
+    return '<div style="display:flex;gap:8px;margin-bottom:8px">'
+      +'<input class="ab-inp" value="'+esc(item)+'" style="flex:1;padding:8px;border:1px solid #d1d5db;border-radius:7px;font-size:0.88rem">'
+      +'<button onclick="this.parentElement.remove()" style="background:rgba(239,68,68,0.1);color:#dc2626;border:none;border-radius:7px;padding:6px 10px;cursor:pointer">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function addAbout(){
+  collectAll();
+  D.aboutList=D.aboutList||[];
+  D.aboutList.push('הישג חדש');
+  renderAbout();
+}
+
+// ===== ARTICLES =====
+function renderArts(){
+  var el=document.getElementById('art-list');
+  el.innerHTML=(D.articlesItems||[]).map(function(a){
+    return '<div class="item art-item">'
+      +'<div class="item-head"><span class="item-title">'+esc(a.title)+'</span>'
+      +'<button class="btn-del" onclick="this.closest(\'.art-item\').remove()">🗑</button></div>'
+      +'<div class="row"><div class="field"><label>תג</label><input data-f="tag" value="'+esc(a.tag)+'"></div>'
+      +'<div class="field"><label>כותרת</label><input data-f="title" value="'+esc(a.title)+'"></div></div>'
+      +'<div class="field"><label>תיאור</label><textarea data-f="desc">'+esc(a.desc)+'</textarea></div>'
+      +'<div class="row"><div class="field"><label>קישור</label><input data-f="link" dir="ltr" value="'+esc(a.link||'')+'"></div>'
+      +'<div class="field"><label>טקסט כפתור</label><input data-f="lt" value="'+esc(a.linkText||'קרא עוד ←')+'"></div></div>'
+      +'</div>';
+  }).join('');
+}
+function addArt(){
+  collectAll();
+  D.articlesItems=D.articlesItems||[];
+  D.articlesItems.push({tag:'כתבה',title:'כותרת חדשה',desc:'תיאור',link:'',linkText:'קרא עוד ←'});
+  renderArts();
+}
+
+// ===== FAQ =====
+function renderFaq(){
+  var el=document.getElementById('faq-list');
+  el.innerHTML=(D.faq||[]).map(function(q,i){
+    return '<div class="item faq-item">'
+      +'<div class="item-head"><span class="item-title">שאלה '+(i+1)+'</span>'
+      +'<button class="btn-del" onclick="this.closest(\'.faq-item\').remove()">🗑</button></div>'
+      +'<div class="field"><label>שאלה</label><input data-f="q" value="'+esc(q.q)+'"></div>'
+      +'<div class="field"><label>תשובה</label><textarea data-f="a">'+esc(q.a)+'</textarea></div>'
+      +'</div>';
+  }).join('');
+}
+function addFaq(){
+  collectAll();
+  D.faq=D.faq||[];
+  D.faq.push({q:'שאלה חדשה?',a:'תשובה'});
+  renderFaq();
+}
+
+// ===== PUBLISH =====
+function openPub(){
+  var t=localStorage.getItem('gh_token');
+  var u=localStorage.getItem('gh_user');
+  var r=localStorage.getItem('gh_repo');
+  if(!t||!u||!r){ openGH(); return; }
+  document.getElementById('pub-status').innerHTML='';
+  document.getElementById('pub-modal').classList.add('show');
+}
+function closePub(){ document.getElementById('pub-modal').classList.remove('show'); }
+
+async function doPublish(){
+  collectAll();
+  var token=localStorage.getItem('gh_token');
+  var user=localStorage.getItem('gh_user');
+  var repo=localStorage.getItem('gh_repo');
+  var status=document.getElementById('pub-status');
+  status.innerHTML='⏳ מוריד קובץ...';
+
+  try{
+    var api='https://api.github.com/repos/'+user+'/'+repo;
+    var hdrs={'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
+
+    // Get current index.html
+    var res=await fetch(api+'/contents/index.html',{headers:hdrs});
+    if(!res.ok) throw new Error('שגיאה בהורדה: '+res.status);
+    var fd=await res.json();
+    var sha=fd.sha;
+
+    // Decode file
+    status.innerHTML='⏳ מעדכן נתונים...';
+    var b64file=fd.content.split('\n').join('');
+    var fileBytes=Uint8Array.from(atob(b64file),function(c){return c.charCodeAt(0);});
+    var fileText=new TextDecoder('utf-8').decode(fileBytes);
+
+    // Build new DEFAULTS
+    var jsonBytes=new TextEncoder().encode(JSON.stringify(D));
+    var bin='';
+    jsonBytes.forEach(function(b){bin+=String.fromCharCode(b);});
+    var newB64=btoa(bin);
+    var newDef="const DEFAULTS = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob('"+newB64+"'),c=>c.charCodeAt(0))));";
+
+    // Replace DEFAULTS line - find and replace
+    var lines=fileText.split('\n');
+    var found=false;
+    for(var i=0;i<lines.length;i++){
+      if(lines[i].indexOf('const DEFAULTS =')===0 || lines[i].indexOf('const DEFAULTS =') > -1 && lines[i].indexOf('const DEFAULTS =') < 5){
+        lines[i]=newDef;
+        found=true;
+        break;
+      }
+    }
+    if(!found){ status.innerHTML='<span style="color:red">❌ לא נמצאה שורת DEFAULTS</span>'; return; }
+    var newText=lines.join('\n');
+
+    // Upload
+    status.innerHTML='⏳ מעלה...';
+    var uploadBytes=new TextEncoder().encode(newText);
+    var uploadBin='';
+    uploadBytes.forEach(function(b){uploadBin+=String.fromCharCode(b);});
+    var uploadB64=btoa(uploadBin);
+
+    var upRes=await fetch(api+'/contents/index.html',{
+      method:'PUT',headers:hdrs,
+      body:JSON.stringify({message:'עדכון תוכן',content:uploadB64,sha:sha})
+    });
+    if(!upRes.ok){ var e=await upRes.json(); throw new Error(e.message||'שגיאת העלאה'); }
+
+    status.innerHTML='<span style="color:#16a34a;font-weight:700">✅ פורסם! יתעדכן תוך ~2 דקות</span>';
+    setTimeout(closePub,3000);
+
+  }catch(e){
+    status.innerHTML='<span style="color:red">❌ '+e.message+'</span>';
+  }
+}
+
+// Auto-save to localStorage every 2 seconds
+setInterval(function(){
+  if(document.getElementById('app').style.display!=='none'){
+    collectAll();
+  }
+},2000);
+</script>
+</body>
+</html>
