@@ -307,18 +307,21 @@ function loadData(){
   .then(function(r){ return r.json(); })
   .then(function(fd){
     // Decode base64 content
+    if(!fd.content){ toast('❌ שגיאה: '+JSON.stringify(fd).slice(0,80)); return; }
     var b64=fd.content.split('\n').join('');
     var bytes=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});
     var text=new TextDecoder('utf-8').decode(bytes);
-    // Extract DEFAULTS
-    var m=text.match(/atob\('([A-Za-z0-9+/=]+)'\)/);
+    // Extract DEFAULTS - find the atob base64 string
+    var m=text.match(/atob\('([A-Za-z0-9+\/=]{100,})'\)/);
     if(m){
-      D=JSON.parse(new TextDecoder('utf-8').decode(Uint8Array.from(atob(m[1]),function(c){return c.charCodeAt(0);})));
-      localStorage.setItem('sn_data',JSON.stringify(D));
-      renderAll();
-      toast('✅ נטען מ-GitHub!');
+      try{
+        D=JSON.parse(new TextDecoder('utf-8').decode(Uint8Array.from(atob(m[1]),function(c){return c.charCodeAt(0);})));
+        localStorage.setItem('sn_data',JSON.stringify(D));
+        renderAll();
+        toast('✅ נטען!');
+      }catch(e2){ toast('❌ שגיאת פענוח: '+e2.message); }
     } else {
-      toast('❌ לא נמצאו נתונים');
+      toast('❌ לא נמצאו נתונים בקובץ');
     }
   })
   .catch(function(e){ toast('❌ '+e.message); });
