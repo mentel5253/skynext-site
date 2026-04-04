@@ -499,7 +499,7 @@ if (window.location.hash && (
 </script>
 
 <!-- GEAR BUTTON -->
-<button id="admin-toggle-btn" onclick="openAdminLogin()" title="פאנל ניהול" style="display: none;">⚙️</button>
+<button id="admin-toggle-btn" style="display:none" onclick="openAdminLogin()" title="פאנל ניהול" style="display: none;">⚙️</button>
 
 <!-- LOGIN OVERLAY -->
 <div id="login-overlay" class="">
@@ -2301,6 +2301,8 @@ function closeEditMode() {
 }
 
 // ===== INIT =====
+// Always start logged out
+localStorage.removeItem('skynext_logged');
 // Always sync DEFAULTS to localStorage so published data shows immediately
 (function(){
   var saved = localStorage.getItem('skynext_data');
